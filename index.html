@@ -2,47 +2,47 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GOLD POINT - TAX FREE SYSTEM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOLD POINT - TAX FREE 2024 (9220 FIX)</title>
     <style>
         body { background-color: #000; color: #D4AF37; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .container { width: 100%; max-width: 400px; background: #111; padding: 25px; border-radius: 20px; border: 1px solid #D4AF37; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1 { font-size: 16px; text-align: center; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 25px; color: #D4AF37; border-bottom: 1px solid #333; padding-bottom: 15px; }
-        label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: block; color: #888; }
-        input { width: 100%; background: #1a1a1a; border: 2px solid #333; border-radius: 12px; padding: 15px; color: #fff; font-size: 32px; text-align: center; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: border 0.3s; }
-        input:focus { border-color: #D4AF37; }
-        button { width: 100%; background: #D4AF37; color: #000; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: transform 0.1s; }
-        button:active { transform: scale(0.98); }
-        #res-box { margin-top: 25px; display: none; background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 5px solid #D4AF37; }
+        .container { width: 100%; max-width: 400px; background: #111; padding: 20px; border-radius: 15px; border: 1px solid #D4AF37; box-sizing: border-box; }
+        h1 { font-size: 16px; text-align: center; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        label { font-size: 11px; color: #888; display: block; margin-bottom: 5px; text-transform: uppercase; }
+        input { width: 100%; background: #1a1a1a; border: 2px solid #D4AF37; border-radius: 10px; padding: 15px; color: #fff; font-size: 32px; text-align: center; box-sizing: border-box; outline: none; margin-bottom: 20px; }
+        .result-box { background: #1a1a1a; padding: 15px; border-radius: 10px; display: none; border-left: 5px solid #D4AF37; }
         .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #222; }
-        .row:last-child { border-bottom: none; }
-        .val { color: #fff; font-weight: bold; font-size: 26px; }
-        .lab { color: #aaa; font-size: 13px; text-transform: uppercase; }
-        .fasha-info { color: #D4AF37; font-size: 11px; text-align: center; margin-top: 15px; display: block; font-style: italic; opacity: 0.8; }
+        .row:last-of-type { border-bottom: none; }
+        .lab { color: #aaa; font-size: 13px; }
+        .val { color: #fff; font-weight: bold; font-size: 24px; }
+        .highlight { color: #00ff00; font-size: 32px; }
+        .fasha-label { background: #D4AF37; color: #000; padding: 10px; margin-top: 15px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 16px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Gold Point System</h1>
-    <label>Shuma Neto (Sa dëshiron klienti)</label>
-    <input type="number" id="netoIn" placeholder="0" inputmode="decimal">
-    <button onclick="calculate()">Llogarit Shifrat</button>
+    <label>Shkruaj shumën NETO (për klientin)</label>
+    <input type="number" id="netoIn" oninput="calculate()" placeholder="0" inputmode="decimal">
 
-    <div id="res-box">
+    <div id="resBox" class="result-box">
         <div class="row">
-            <span class="lab">Shkruaj në PC:</span>
-            <span class="val" id="brutoOut"></span>
+            <span class="lab">SHKRUAJ NË PC:</span>
+            <span class="val highlight" id="brutoOut"></span>
         </div>
         <div class="row">
-            <span class="lab">Rimbursimi (TAX):</span>
+            <span class="lab">TAX (Refund):</span>
             <span class="val" id="taxOut"></span>
         </div>
-        <span class="fasha-info" id="fashaOut"></span>
+        
+        <label style="margin-top:15px; display:block; text-align:center;">Fasha Zyrtare në Tabelë:</label>
+        <div class="fasha-label" id="fashaInfo"></div>
     </div>
 </div>
 
 <script>
+// Tabela e saktësuar sipas dokumentit të fundit CZF 2024
 const tiers = [
     {min:2001, max:2249, r:270}, {min:2250, max:2499, r:285}, {min:2500, max:2749, r:310}, {min:2750, max:2999, r:340},
     {min:3000, max:3249, r:370}, {min:3250, max:3499, r:400}, {min:3500, max:3749, r:430}, {min:3750, max:3999, r:450},
@@ -73,7 +73,7 @@ const tiers = [
     {min:52000, max:52999, r:6850}, {min:53000, max:53999, r:6990}, {min:54000, max:54999, r:7150}, {min:55000, max:55999, r:7300},
     {min:56000, max:56999, r:7450}, {min:57000, max:57999, r:7600}, {min:58000, max:58999, r:7750}, {min:59000, max:59999, r:7910},
     {min:60000, max:60999, r:8060}, {min:61000, max:61999, r:8220}, {min:62000, max:62999, r:8360}, {min:63000, max:63999, r:8520},
-    {min:64000, max:64999, r:8670}, {min:65000, max:65999, r:8830}, {min:66000, max:66999, r:8990}, {min:67000, max:67999, r:8220},
+    {min:64000, max:64999, r:8670}, {min:65000, max:65999, r:8830}, {min:66000, max:66999, r:8990}, {min:67000, max:67999, r:9220},
     {min:68000, max:68999, r:9300}, {min:69000, max:69999, r:9460}, {min:70000, max:70999, r:9620}, {min:71000, max:71999, r:9780},
     {min:72000, max:72999, r:9940}, {min:73000, max:73999, r:10100}, {min:74000, max:74999, r:10260}, {min:75000, max:75999, r:10430},
     {min:76000, max:76999, r:10600}, {min:77000, max:77999, r:10750}, {min:78000, max:78999, r:10920}, {min:79000, max:79999, r:11090},
@@ -85,45 +85,36 @@ const tiers = [
 ];
 
 function calculate() {
-    const input = document.getElementById('netoIn').value;
-    if (!input || input < 1731) return; // Minimumi real neto është rreth 1731 CZK
+    const neto = parseFloat(document.getElementById('netoIn').value);
+    const resBox = document.getElementById('resBox');
+    
+    if (!neto || neto < 1731) {
+        resBox.style.display = "none";
+        return;
+    }
 
-    const neto = parseFloat(input);
-    let bruto, tax, fasha;
-
-    // Kontrollojmë nëse i kalon 100,000 (Mbi 100,000 është 15% fiks)
-    if (neto > 85470) { 
-        // 85,470 neto x 15% tax = rreth 100k bruto
-        bruto = neto / 0.85;
-        tax = bruto - neto;
-        fasha = "Mbi 100,000 CZK (15%)";
-    } else {
-        // Kontrollojmë tabelën për çdo fashë
-        let found = false;
-        for (let t of tiers) {
-            let testBruto = neto + t.r;
-            if (testBruto >= t.min && testBruto <= t.max) {
-                bruto = testBruto;
-                tax = t.r;
-                fasha = t.min + " - " + t.max + " CZK";
-                found = true;
-                break;
-            }
-        }
-        
-        // Nëse bie fiks në kufi ose jashtë listës së detajuar
-        if (!found) {
-            bruto = neto / 0.854; // Përqindja mesatare e PTF
-            tax = bruto - neto;
-            fasha = "Llogaritje mesatare";
+    let found = false;
+    for (let t of tiers) {
+        let testBruto = neto + t.r;
+        if (testBruto >= t.min && testBruto <= t.max) {
+            document.getElementById('brutoOut').innerText = Math.round(testBruto).toLocaleString();
+            document.getElementById('taxOut').innerText = t.r.toLocaleString() + " CZK";
+            document.getElementById('fashaInfo').innerText = t.min.toLocaleString() + " — " + t.max.toLocaleString() + " CZK";
+            found = true;
+            break;
         }
     }
 
-    document.getElementById('brutoOut').innerText = Math.round(bruto).toLocaleString();
-    document.getElementById('taxOut').innerText = Math.round(tax).toLocaleString();
-    document.getElementById('fashaOut').innerText = "Fasha zyrtare: " + fasha;
-    document.getElementById('res-box').style.display = "block";
-    document.activeElement.blur();
+    if (!found && neto > 85000) {
+        let bruto = Math.round(neto / 0.85);
+        document.getElementById('brutoOut').innerText = bruto.toLocaleString();
+        document.getElementById('taxOut').innerText = (bruto - neto).toLocaleString() + " CZK";
+        document.getElementById('fashaInfo').innerText = "Mbi 100,000 (15%)";
+        found = true;
+    }
+
+    if (found) resBox.style.display = "block";
+    else resBox.style.display = "none";
 }
 </script>
 
