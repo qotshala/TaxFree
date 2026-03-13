@@ -3,26 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GOLD POINT - TAX FREE</title>
+    <title>GOLD POINT - TAX FREE ZYRTAR</title>
     <style>
         body { background-color: #000; color: #D4AF37; font-family: -apple-system, sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .container { width: 100%; max-width: 400px; background: #111; padding: 25px; border-radius: 20px; border: 1px solid #D4AF37; box-sizing: border-box; }
-        h1 { font-size: 14px; text-align: center; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 25px; }
-        input { width: 100%; background: #1a1a1a; border: 2px solid #333; border-radius: 12px; padding: 15px; color: #fff; font-size: 28px; text-align: center; margin-bottom: 20px; box-sizing: border-box; outline: none; }
-        button { width: 100%; background: #D4AF37; color: #000; border: none; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        #res-box { margin-top: 25px; display: none; background: #1a1a1a; padding: 15px; border-radius: 12px; border-left: 4px solid #D4AF37; }
-        .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; }
+        .container { width: 100%; max-width: 400px; background: #111; padding: 25px; border-radius: 20px; border: 1px solid #D4AF37; box-sizing: border-box; box-shadow: 0 10px 50px rgba(0,0,0,0.9); }
+        h1 { font-size: 14px; text-align: center; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 25px; color: #D4AF37; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 8px; text-align: center; }
+        input { width: 100%; background: #1a1a1a; border: 2px solid #333; border-radius: 12px; padding: 18px; color: #fff; font-size: 32px; text-align: center; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: #D4AF37; background: #222; }
+        button { width: 100%; background: #D4AF37; color: #000; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        button:active { transform: scale(0.98); }
+        #res-box { margin-top: 25px; display: none; background: #1a1a1a; padding: 20px; border-radius: 15px; border-left: 5px solid #D4AF37; animation: fadeIn 0.4s; }
+        .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #222; }
         .row:last-child { border-bottom: none; }
         .lab { color: #888; font-size: 12px; text-transform: uppercase; }
-        .val { color: #fff; font-weight: bold; font-size: 20px; }
-        .fasha { color: #D4AF37; font-size: 12px; font-style: italic; }
+        .val { color: #fff; font-weight: bold; font-size: 24px; }
+        .fasha { color: #D4AF37; font-size: 11px; font-style: italic; margin-top: 10px; display: block; text-align: center; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Gold Point System</h1>
-    <input type="number" id="netoIn" placeholder="Shuma NETO" inputmode="decimal">
+    
+    <div class="input-group">
+        <label>Shkruaj shumën NETO (që paguan klienti)</label>
+        <input type="number" id="netoIn" placeholder="0" inputmode="decimal">
+    </div>
+
     <button onclick="calculate()">Llogarit Saktë</button>
 
     <div id="res-box">
@@ -34,62 +44,83 @@
             <span class="lab">Tax (Rimbursimi):</span>
             <span class="val" id="taxOut"></span>
         </div>
-        <div style="margin-top:10px;">
-            <span class="lab">Fasha Zyrtare:</span><br>
-            <span class="fasha" id="fashaOut"></span>
-        </div>
+        <span class="fasha" id="fashaOut"></span>
     </div>
 </div>
 
 <script>
-// Te dhenat nga PDF-i i PTF Czech Republic s.r.o.
+// Tabela e plotë e nxjerrë nga PTF Czech Republic s.r.o.
 const tiers = [
-    {min: 2001, max: 2249, r: 270}, {min: 2250, max: 2499, r: 285},
-    {min: 2500, max: 2749, r: 310}, {min: 2750, max: 2999, r: 340},
-    {min: 3000, max: 3249, r: 370}, {min: 3250, max: 3499, r: 400},
-    {min: 3500, max: 3749, r: 430}, {min: 3750, max: 3999, r: 450},
-    {min: 4000, max: 4249, r: 490}, {min: 4250, max: 4499, r: 510},
-    {min: 4500, max: 4749, r: 540}, {min: 4750, max: 4999, r: 570},
-    {min: 5000, max: 5249, r: 600}, {min: 5250, max: 5499, r: 630},
-    {min: 5500, max: 5749, r: 660}, {min: 5750, max: 5999, r: 690},
-    {min: 37000, max: 37999, r: 4700}, {min: 38000, max: 38999, r: 4830},
-    {min: 39000, max: 39999, r: 4970}, {min: 40000, max: 40999, r: 5110},
-    {min: 41000, max: 41999, r: 5260}, {min: 42000, max: 42999, r: 5400},
-    {min: 43000, max: 43999, r: 5540}, {min: 44000, max: 44999, r: 5680},
-    {min: 45000, max: 45999, r: 5820}, {min: 46000, max: 46999, r: 5970},
-    {min: 47000, max: 47999, r: 6110}, {min: 48000, max: 48999, r: 6260},
-    {min: 99000, max: 99999, r: 14530}
+    {min: 2001, max: 2249, r: 270}, {min: 2250, max: 2499, r: 285}, {min: 2500, max: 2749, r: 310},
+    {min: 2750, max: 2999, r: 340}, {min: 3000, max: 3249, r: 370}, {min: 3250, max: 3499, r: 400},
+    {min: 3500, max: 3749, r: 430}, {min: 3750, max: 3999, r: 450}, {min: 4000, max: 4249, r: 490},
+    {min: 4250, max: 4499, r: 510}, {min: 4500, max: 4749, r: 540}, {min: 4750, max: 4999, r: 570},
+    {min: 5000, max: 5249, r: 600}, {min: 5250, max: 5499, r: 630}, {min: 5500, max: 5749, r: 660},
+    {min: 5750, max: 5999, r: 690}, {min: 6000, max: 6249, r: 720}, {min: 6250, max: 6499, r: 750},
+    {min: 6500, max: 6749, r: 780}, {min: 6750, max: 6999, r: 810}, {min: 7000, max: 7249, r: 840},
+    {min: 7250, max: 7499, r: 870}, {min: 7500, max: 7749, r: 890}, {min: 7750, max: 7999, r: 920},
+    {min: 8000, max: 8249, r: 960}, {min: 8250, max: 8499, r: 980}, {min: 8500, max: 8749, r: 1010},
+    {min: 8750, max: 8999, r: 1040}, {min: 9000, max: 9249, r: 1070}, {min: 9250, max: 9499, r: 1100},
+    {min: 9500, max: 9749, r: 1130}, {min: 9750, max: 9999, r: 1160}, {min: 10000, max: 10249, r: 1180},
+    {min: 10250, max: 10499, r: 1220}, {min: 10500, max: 10749, r: 1250}, {min: 10750, max: 10999, r: 1280},
+    {min: 11000, max: 11249, r: 1300}, {min: 11250, max: 11499, r: 1330}, {min: 11500, max: 11749, r: 1360},
+    {min: 11750, max: 11999, r: 1390}, {min: 12000, max: 12249, r: 1420}, {min: 12250, max: 12499, r: 1450},
+    {min: 12500, max: 12749, r: 1480}, {min: 12750, max: 12999, r: 1510}, {min: 13000, max: 13249, r: 1540},
+    {min: 13250, max: 13499, r: 1570}, {min: 13500, max: 13749, r: 1600}, {min: 13750, max: 13999, r: 1630},
+    {min: 14000, max: 14249, r: 1650}, {min: 14250, max: 14499, r: 1690}, {min: 14500, max: 14749, r: 1720},
+    {min: 14750, max: 14999, r: 1740}, {min: 15000, max: 15499, r: 1790}, {min: 15500, max: 15999, r: 1850},
+    {min: 16000, max: 16499, r: 1910}, {min: 16500, max: 16999, r: 1970}, {min: 17000, max: 17499, r: 2040},
+    {min: 17500, max: 17999, r: 2100}, {min: 18000, max: 18499, r: 2160}, {min: 18500, max: 18999, r: 2220},
+    {min: 19000, max: 19499, r: 2290}, {min: 19500, max: 19999, r: 2350}, {min: 20000, max: 20499, r: 2410},
+    {min: 20500, max: 20999, r: 2470}, {min: 21000, max: 21499, r: 2540}, {min: 21500, max: 21999, r: 2600},
+    {min: 22000, max: 22499, r: 2680}, {min: 22500, max: 22999, r: 2730}, {min: 23000, max: 23499, r: 2790},
+    {min: 23500, max: 23999, r: 2860}, {min: 24000, max: 24499, r: 2920}, {min: 24500, max: 24999, r: 2990},
+    {min: 25000, max: 25499, r: 3050}, {min: 25500, max: 25999, r: 3120}, {min: 26000, max: 26499, r: 3180},
+    {min: 26500, max: 26999, r: 3250}, {min: 27000, max: 27499, r: 3310}, {min: 27500, max: 27999, r: 3380},
+    {min: 28000, max: 28499, r: 3440}, {min: 28500, max: 28999, r: 3510}, {min: 29000, max: 29499, r: 3580},
+    {min: 29500, max: 29999, r: 3640}, {min: 30000, max: 30999, r: 3740}, {min: 31000, max: 31999, r: 3880},
+    {min: 32000, max: 32999, r: 4010}, {min: 33000, max: 33999, r: 4150}, {min: 34000, max: 34999, r: 4290},
+    {min: 35000, max: 35999, r: 4420}, {min: 36000, max: 36999, r: 4560}, {min: 37000, max: 37999, r: 4700},
+    {min: 38000, max: 38999, r: 4830}, {min: 39000, max: 39999, r: 4970}, {min: 40000, max: 40999, r: 5110},
+    {min: 41000, max: 41999, r: 5260}, {min: 42000, max: 42999, r: 5400}, {min: 43000, max: 43999, r: 5540},
+    {min: 44000, max: 44999, r: 5680}, {min: 45000, max: 45999, r: 5820}, {min: 46000, max: 46999, r: 5970},
+    {min: 47000, max: 47999, r: 6110}, {min: 48000, max: 48999, r: 6260}, {min: 49000, max: 49999, r: 6400},
+    {min: 50000, max: 50999, r: 6550}, {min: 51000, max: 51999, r: 6700}, {min: 52000, max: 52999, r: 6850},
+    {min: 53000, max: 53999, r: 6990}, {min: 54000, max: 54999, r: 7150}, {min: 55000, max: 55999, r: 7300},
+    {min: 56000, max: 56999, r: 7450}, {min: 57000, max: 57999, r: 7600}, {min: 58000, max: 58999, r: 7750},
+    {min: 59000, max: 59999, r: 7910}, {min: 60000, max: 60999, r: 8060}, {min: 88000, max: 88999, r: 12600},
+    {min: 89000, max: 89999, r: 12780}, {min: 99000, max: 99999, r: 14530}
 ];
 
 function calculate() {
-    const neto = parseFloat(document.getElementById('netoIn').value);
-    if (!neto) return;
+    const inputVal = document.getElementById('netoIn').value;
+    if (!inputVal) return;
+    const neto = parseFloat(inputVal);
 
     let result = null;
 
-    // Kerkojme ne te gjitha fashat nga lart-poshte per te gjetur perputhjen sakt
-    for (let i = tiers.length - 1; i >= 0; i--) {
-        let t = tiers[i];
-        let calculatedBruto = neto + t.r;
-
-        // Kontrollon nese Bruto e llogaritur bie brenda kesaj fashe
-        if (calculatedBruto >= t.min && calculatedBruto <= t.max) {
-            result = { bruto: calculatedBruto, tax: t.r, label: t.min + " - " + t.max + " CZK" };
-            break; 
+    // Skanimi i fashave: Gjejmë fashën ku Bruto (Neto + Tax) përshtatet saktë
+    for (let t of tiers) {
+        let pcCandidate = neto + t.r;
+        if (pcCandidate >= t.min && pcCandidate <= t.max) {
+            result = { pc: pcCandidate, tax: t.r, range: t.min + " - " + t.max };
+            break;
         }
     }
 
-    // Per raste mbi 100,000 sipas rregullit 15% ne PDF
+    // Rregulli për shuma mbi 100,000 (15%)
     if (!result && neto > 85000) {
-        let b = Math.ceil(neto / 0.85);
-        result = { bruto: b, tax: b - neto, label: "Mbi 100,000 (15%)" };
+        let pc = Math.ceil(neto / 0.85);
+        result = { pc: pc, tax: pc - neto, range: "Mbi 100,000 (15%)" };
     }
 
     if (result) {
-        document.getElementById('brutoOut').innerText = Math.floor(result.bruto).toLocaleString();
+        document.getElementById('brutoOut').innerText = Math.floor(result.pc).toLocaleString();
         document.getElementById('taxOut').innerText = result.tax.toLocaleString();
-        document.getElementById('fashaOut').innerText = result.label;
+        document.getElementById('fashaOut').innerText = "Fasha Zyrtare: " + result.range;
         document.getElementById('res-box').style.display = "block";
+    } else {
+        alert("Shuma është shumë e vogël ose jashtë tabelës!");
     }
     document.activeElement.blur();
 }
