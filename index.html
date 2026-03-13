@@ -3,186 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GOLD POINT SYSTEM</title>
+    <title>GOLD POINT - TAX FREE</title>
     <style>
-        body {
-            background-color: #000;
-            color: #D4AF37;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            padding-top: 50px;
-            margin: 0;
-            min-height: 100vh;
-        }
-
-        .calc-container {
-            width: 90%;
-            max-width: 400px;
-            background: #111;
-            padding: 25px;
-            border-radius: 25px;
-            border: 1px solid #D4AF37;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 16px;
-            letter-spacing: 3px;
-            margin-bottom: 30px;
-            color: #D4AF37;
-            text-transform: uppercase;
-        }
-
-        /* Fusha ku shkruan numrat */
-        input[type="number"] {
-            width: 100%;
-            background: #1a1a1a;
-            border: 2px solid #333;
-            border-radius: 15px;
-            padding: 20px;
-            color: #fff;
-            font-size: 32px;
-            text-align: center;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        input[type="number"]:focus {
-            border-color: #D4AF37;
-        }
-
-        button {
-            width: 100%;
-            background: #D4AF37;
-            color: #000;
-            border: none;
-            padding: 20px;
-            border-radius: 15px;
-            font-size: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
-            margin-bottom: 25px;
-        }
-
-        button:active {
-            opacity: 0.8;
-        }
-
-        /* Kutia e rezultateve */
-        #result-box {
-            background: #222;
-            border-radius: 15px;
-            padding: 20px;
-            border-left: 5px solid #D4AF37;
-            display: none;
-            text-align: left;
-            animation: slideUp 0.3s ease;
-        }
-
-        .res-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .res-label { color: #888; font-size: 12px; text-transform: uppercase; }
-        .res-value { color: #fff; font-size: 22px; font-weight: bold; }
-        #fasha-val { color: #D4AF37; font-size: 14px; }
-
-        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        body { background-color: #000; color: #D4AF37; font-family: -apple-system, sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .container { width: 100%; max-width: 400px; background: #111; padding: 25px; border-radius: 20px; border: 1px solid #D4AF37; box-sizing: border-box; }
+        h1 { font-size: 14px; text-align: center; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 25px; }
+        input { width: 100%; background: #1a1a1a; border: 2px solid #333; border-radius: 12px; padding: 15px; color: #fff; font-size: 28px; text-align: center; margin-bottom: 20px; box-sizing: border-box; outline: none; }
+        button { width: 100%; background: #D4AF37; color: #000; border: none; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        #res-box { margin-top: 25px; display: none; background: #1a1a1a; padding: 15px; border-radius: 12px; border-left: 4px solid #D4AF37; }
+        .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; }
+        .row:last-child { border-bottom: none; }
+        .lab { color: #888; font-size: 12px; text-transform: uppercase; }
+        .val { color: #fff; font-weight: bold; font-size: 20px; }
+        .fasha { color: #D4AF37; font-size: 12px; font-style: italic; }
     </style>
 </head>
 <body>
 
-<div class="calc-container">
-    <h1>GOLD POINT GROUP SYSTEM</h1>
-    
-    <input type="number" id="netoInput" placeholder="0" inputmode="numeric" pattern="[0-9]*">
-    
-    <button onclick="llogarit()">Llogarit</button>
+<div class="container">
+    <h1>Gold Point System</h1>
+    <input type="number" id="netoIn" placeholder="Shuma NETO" inputmode="decimal">
+    <button onclick="calculate()">Llogarit Saktë</button>
 
-    <div id="result-box">
-        <div class="res-row">
-            <span class="res-label">Shkruaj në PC:</span>
-            <span class="res-value" id="pc-val">0</span>
+    <div id="res-box">
+        <div class="row">
+            <span class="lab">Në PC (Bruto):</span>
+            <span class="val" id="brutoOut"></span>
         </div>
-        <div class="res-row">
-            <span class="res-label">Rimbursimi:</span>
-            <span class="res-value" id="tax-val">0</span>
+        <div class="row">
+            <span class="lab">Tax (Rimbursimi):</span>
+            <span class="val" id="taxOut"></span>
         </div>
-        <div style="margin-top:10px; border-top: 1px solid #333; padding-top:10px;">
-            <span class="res-label">Fasha:</span><br>
-            <span id="fasha-val"></span>
+        <div style="margin-top:10px;">
+            <span class="lab">Fasha Zyrtare:</span><br>
+            <span class="fasha" id="fashaOut"></span>
         </div>
     </div>
 </div>
 
 <script>
-    // Tabela e të dhënave (e njëjta që kemi konfirmuar)
-    const data = [
-        {min: 2001, max: 2300, r: 270}, {min: 2301, max: 2650, r: 310},
-        {min: 2651, max: 3000, r: 360}, {min: 3001, max: 3350, r: 410},
-        {min: 3351, max: 3700, r: 460}, {min: 3701, max: 4000, r: 500},
-        {min: 4001, max: 4350, r: 550}, {min: 4351, max: 4700, r: 600},
-        {min: 4701, max: 5000, r: 640}, {min: 5001, max: 5500, r: 700},
-        {min: 5501, max: 6000, r: 770}, {min: 6001, max: 6500, r: 840},
-        {min: 6501, max: 7000, r: 910}, {min: 7001, max: 7500, r: 980},
-        {min: 7501, max: 8000, r: 1050}, {min: 8001, max: 8500, r: 1120},
-        {min: 8501, max: 9000, r: 1190}, {min: 9001, max: 9500, r: 1260},
-        {min: 9501, max: 10000, r: 1330}, {min: 10001, max: 11000, r: 1470},
-        {min: 11001, max: 12000, r: 1610}, {min: 12001, max: 13000, r: 1760},
-        {min: 13001, max: 14000, r: 1910}, {min: 14001, max: 15000, r: 2060},
-        {min: 15001, max: 16000, r: 2210}, {min: 16001, max: 17000, r: 2360},
-        {min: 17001, max: 18500, r: 2550}, {min: 18501, max: 20000, r: 2780},
-        {min: 20001, max: 21500, r: 3000}, {min: 21501, max: 23000, r: 3220},
-        {min: 23001, max: 24500, r: 3450}, {min: 24501, max: 26500, r: 3770},
-        {min: 26501, max: 28500, r: 4070}, {min: 28501, max: 31000, r: 4450},
-        {min: 31001, max: 33500, r: 4830}, {min: 33501, max: 36000, r: 5210},
-        {min: 36001, max: 38500, r: 5580}, {min: 38501, max: 41000, r: 5960},
-        {min: 41001, max: 44000, r: 6420}, {min: 44001, max: 47000, r: 6890},
-        {min: 47001, max: 50000, r: 7350}, {min: 50001, max: 55000, r: 8120},
-        {min: 55001, max: 60000, r: 8880}, {min: 60001, max: 65000, r: 9660},
-        {min: 65001, max: 70000, r: 10420}, {min: 70001, max: 80000, r: 11840},
-        {min: 80001, max: 90000, r: 13380}, {min: 90001, max: 100000, r: 14530}
-    ];
+// Te dhenat nga PDF-i i PTF Czech Republic s.r.o.
+const tiers = [
+    {min: 2001, max: 2249, r: 270}, {min: 2250, max: 2499, r: 285},
+    {min: 2500, max: 2749, r: 310}, {min: 2750, max: 2999, r: 340},
+    {min: 3000, max: 3249, r: 370}, {min: 3250, max: 3499, r: 400},
+    {min: 3500, max: 3749, r: 430}, {min: 3750, max: 3999, r: 450},
+    {min: 4000, max: 4249, r: 490}, {min: 4250, max: 4499, r: 510},
+    {min: 4500, max: 4749, r: 540}, {min: 4750, max: 4999, r: 570},
+    {min: 5000, max: 5249, r: 600}, {min: 5250, max: 5499, r: 630},
+    {min: 5500, max: 5749, r: 660}, {min: 5750, max: 5999, r: 690},
+    {min: 37000, max: 37999, r: 4700}, {min: 38000, max: 38999, r: 4830},
+    {min: 39000, max: 39999, r: 4970}, {min: 40000, max: 40999, r: 5110},
+    {min: 41000, max: 41999, r: 5260}, {min: 42000, max: 42999, r: 5400},
+    {min: 43000, max: 43999, r: 5540}, {min: 44000, max: 44999, r: 5680},
+    {min: 45000, max: 45999, r: 5820}, {min: 46000, max: 46999, r: 5970},
+    {min: 47000, max: 47999, r: 6110}, {min: 48000, max: 48999, r: 6260},
+    {min: 99000, max: 99999, r: 14530}
+];
 
-    function llogarit() {
-        const input = document.getElementById('netoInput').value;
-        if (!input) return;
+function calculate() {
+    const neto = parseFloat(document.getElementById('netoIn').value);
+    if (!neto) return;
 
-        let netoKerkues = parseInt(input);
-        let gjetur = false;
+    let result = null;
 
-        for (let i = 0; i < data.length; i++) {
-            let f = data[i];
-            let brutoE_mundshme = netoKerkues + f.r;
-            if (brutoE_mundshme >= f.min && brutoE_mundshme <= f.max) {
-                shfaqRezultatin(brutoE_mundshme, f.r, f.min + " - " + f.max);
-                gjetur = true;
-                break;
-            }
+    // Kerkojme ne te gjitha fashat nga lart-poshte per te gjetur perputhjen sakt
+    for (let i = tiers.length - 1; i >= 0; i--) {
+        let t = tiers[i];
+        let calculatedBruto = neto + t.r;
+
+        // Kontrollon nese Bruto e llogaritur bie brenda kesaj fashe
+        if (calculatedBruto >= t.min && calculatedBruto <= t.max) {
+            result = { bruto: calculatedBruto, tax: t.r, label: t.min + " - " + t.max + " CZK" };
+            break; 
         }
-
-        if (!gjetur) {
-            let brutoSakte = Math.ceil(netoKerkues / 0.85);
-            shfaqRezultatin(brutoSakte, brutoSakte - netoKerkues, "Mbi 100,000 (15%)");
-        }
-        
-        // Fsheh tastierën pas llogaritjes
-        document.activeElement.blur();
     }
 
-    function shfaqRezultatin(pc, tax, fasha) {
-        document.getElementById('pc-val').innerText = Math.floor(pc).toLocaleString();
-        document.getElementById('tax-val').innerText = Math.floor(tax).toLocaleString();
-        document.getElementById('fasha-val').innerText = fasha;
-        document.getElementById('result-box').style.display = "block";
+    // Per raste mbi 100,000 sipas rregullit 15% ne PDF
+    if (!result && neto > 85000) {
+        let b = Math.ceil(neto / 0.85);
+        result = { bruto: b, tax: b - neto, label: "Mbi 100,000 (15%)" };
     }
+
+    if (result) {
+        document.getElementById('brutoOut').innerText = Math.floor(result.bruto).toLocaleString();
+        document.getElementById('taxOut').innerText = result.tax.toLocaleString();
+        document.getElementById('fashaOut').innerText = result.label;
+        document.getElementById('res-box').style.display = "block";
+    }
+    document.activeElement.blur();
+}
 </script>
 
 </body>
